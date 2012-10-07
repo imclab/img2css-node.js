@@ -7,3 +7,9 @@ img2css converts any image file to pixel perfect pure CSS image.
 - div
 
 This is node.js version of the [img2css](https://github.com/roman01la/img2css) tool. It uses WebSockets ([socket.io](http://socket.io/) module) for real-time data transfering. Server-side image processing is much better in terms of performance.
+
+# License
+
+MIT licensed
+
+Copyright (C) 2012 Roman Liutikov, http://romanliutikov.com/

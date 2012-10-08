@@ -1,0 +1,56 @@
+extends layout
+
+block header
+	header
+			ul
+				li
+					a(href="http://romanliutikov.com/")(target="blank_") Roman Liutikov
+				li
+					|
+				li
+					a(href="https://twitter.com/roman01la")(target="blank_") Twitter
+
+
+block content
+	.wrap
+		.ui
+			.controls
+				.upload-img
+					p choose file
+				ul.mode
+					li Choose rendering mode:
+					li.div
+						input(type="radio")(name="mode")
+						span div
+							small.red (slow)
+					li.box-shadow
+						input(type="radio")(name="mode")(checked="checked")
+						span box-shadow
+							small.green (fast)
+			.notification.red
+		.output
+			div
+		form
+			textarea(rows="10")
+			textarea(rows="10")
+		input.input-img.hidden(type="file")(accept="image/*")
+
+
+block footer
+	footer
+		p
+			small Look ma, I can use it the way I want!
+
+
+block scripts
+	script(src="/socket.io/socket.io.js")
+	script(src="/js/img2css.js")
+	script
+		var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview'],['_trackPageLoadTime']];
+		(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
+		g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+		s.parentNode.insertBefore(g,s)}(document,'script'));
+	//if lt IE 7
+		script(defer, src='//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js')
+		script(defer)
+			window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})

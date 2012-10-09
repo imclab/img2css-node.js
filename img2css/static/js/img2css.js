@@ -12,18 +12,17 @@ var uploadImg = document.querySelector(".upload-img"),
 /*
 * img2css object
 *
-* functions: run(), renderingMode.boxShadow(), renderingMode.div(), render.boxShadow(), render.div(), stuff(), message()
+* functions: run(), renderingMode.boxShadow(), renderingMode.div(), render.boxShadow(), render.div(), stuff(), message(), fillForm(), test()
 *
 */
 
 img2css = {
 
 	// Get pixels
-	run: function(result) {
+	run: function(result, runMode) {
 
 		// catch processing start time
-		at = new Date();
-		at = at.getTime();
+		this.timer.start();
 
 		var a = document.querySelector('.output > div > div'),
 			b = document.querySelector('.output > div');
@@ -32,7 +31,11 @@ img2css = {
 		this.fillForm(0, '');
 		this.fillForm(1, '');
 
+		if(runMode=='test') {
+			this.message('Running test processing...'); // display message
+		} else {
 		this.message('Processing...'); // display message
+		}
 		cont.style.width = cont.style.height = ''; // refresh output container size
 
 		var img = new Image();
@@ -40,12 +43,13 @@ img2css = {
 		img.src = result;
 		cnvs = canvas; // global canvas
 
-		setTimeout(function() { // 50ms timeout for canvas size setup
+		img.onload = function() { // 50ms timeout for canvas size setup
 			canvas.width = img.width;
 			canvas.height = img.height;
 			ctx = canvas.getContext('2d');
 			ctx.drawImage(img, 0, 0);
 
+			console.log('img2css: Retrieving image data '+img2css.timer.time());
 			var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 			var pxs = []; // pixels
 			var rows = []; // rows
@@ -60,6 +64,7 @@ img2css = {
 				rows[j] = pxs.splice(0, canvas.width);
 			}
 
+			console.log('img2css: Sending image data '+img2css.timer.time());
 			// init processing
 			if(mode.checked === true) {
 				img2css.renderingMode.boxShadow(rows);
@@ -67,18 +72,20 @@ img2css = {
 				img2css.renderingMode.div(rows);
 			}
 
-		}, 50);
+		};
 	},
 
 	// Rendering mode
 	renderingMode: {
 		// box-shadow rendering mode. send image data
 		boxShadow: function(canvas) {
+			console.log('img2css: Running processing in box-shadow mode '+img2css.timer.time());
 			socket.emit('processBoxShadow', canvas);
 		},
 
 		// div rendering mode. send image data
 		div: function(canvas) {
+			console.log('img2css: Running processing in div mode '+img2css.timer.time());
 			socket.emit('processDiv', canvas);
 		}
 	},
@@ -86,6 +93,7 @@ img2css = {
 	// Render image data
 	render: {
 		boxShadow: function(rows, nodesNum) {
+			console.log('img2css: Rendering processed data '+img2css.timer.time());
 			var initPixel = document.createElement('div'),
 					wrapper = document.createElement('div');
 			cont.style.width = cnvs.width + 'px';
@@ -101,6 +109,7 @@ img2css = {
 		},
 
 		div: function(rows, nodesNum) {
+			console.log('img2css: Rendering processed data '+img2css.timer.time());
 			var wrapper = document.createElement('div');
 			cont.style.width = cnvs.width + 'px';
 			cont.style.height = cnvs.height + 'px';
@@ -145,27 +154,57 @@ img2css = {
 			text = 'Nodes appended: ';
 			this.fillForm(0, htmlOutput);
 			this.fillForm(1, cssOutput);
-
 		}
 
-		// catch processing end time
-		bt = new Date();
-		bt = bt.getTime();
-
 		// display processing time
-		processedMsg = text + nodesNum + '<br>Processing time: ' + (bt - at - 50) / 1000 + 's';
+		processedMsg = text + nodesNum + '<br>Processing time: ' + this.timer.time();
 		this.message(processedMsg);
+		console.log('img2css: Done! ' + text + nodesNum + ' Processing time: ' + this.timer.time());
 	},
 
-	// Notifications
+	// notifications
 	message: function(message) {
 		var notification = document.querySelector('.notification');
 		notification.innerHTML = message;
 	},
 
+	// fill forms with CSS and HTML output
 	fillForm: function(formNum, message) {
 		var form = document.querySelectorAll('textarea');
 		form[formNum].innerHTML = message;
+	},
+
+	// perform test rendering onload
+	test: function() {
+		var xhr = new XMLHttpRequest(),
+				fileReader = new FileReader();
+
+		xhr.open('GET', '/images/test.png');
+		xhr.responseType = "blob";
+		xhr.send();
+		xhr.onload = function() {
+			if (xhr.status === 200) {
+				fileReader.onload = function(event) {
+					img2css.run(event.target.result, 'test');
+					console.log('--> img2css: Input has been received, run();');
+				};
+				fileReader.readAsDataURL(xhr.response);
+			}
+		};
+	},
+
+	// timer
+	timer: {
+		start: function() {
+			at = new Date();
+			at = at.getTime();
+		},
+		time: function() {
+			bt = new Date();
+			bt = bt.getTime();
+
+			return (bt - at - 50) / 1000 + 's';
+		}
 	}
 };
 
@@ -179,11 +218,13 @@ img2css.message('Be careful with hi-res images. This may take awhile... and free
 
 // box-shadow rendering mode. receive and render processed image data
 socket.on('processedBoxShadow', function(rows, nodesNum) {
+	console.log('img2css: Receiving processed data '+img2css.timer.time());
 	img2css.render.boxShadow(rows, nodesNum);
 });
 
 // div rendering mode. receive and render processed image data
 socket.on('processedDiv', function(rows, nodesNum) {
+	console.log('img2css: Receiving processed data '+img2css.timer.time());
 	img2css.render.div(rows, nodesNum);
 });
 
@@ -201,6 +242,7 @@ inputImg.onchange = function(event) {
 		img2css.run(event.target.result);
 	};
 	fileReader.readAsDataURL(file);
+	console.log('--> img2css: Input has been received, run();');
 };
 
 // input event listener

@@ -1,6 +1,6 @@
 #Image to CSS Tool on Node.js
 
-[img2css live](http://romanliutikov.com/lab/img2css/)
+[img2css live](http://img2css.romanliutikov.com/)
 
 img2css converts any image file to pixel perfect pure CSS image.
 

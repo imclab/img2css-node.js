@@ -2,8 +2,8 @@
 var socket = io.connect('http://localhost');
 
 // Input/Output
-var uploadImg = document.querySelector(".upload-img"),
-	inputImg = document.querySelector(".input-img"),
+var uploadImg = document.querySelector('.upload-img'),
+	inputImg = document.querySelector('.input-img'),
 	mode = document.querySelector('.box-shadow input'),
 	cont = document.querySelector('.output > div'),
 	at, bt, cnvs;
@@ -34,7 +34,7 @@ img2css = {
 		if(runMode=='test') {
 			this.message('Running test processing...'); // display message
 		} else {
-		this.message('Processing...'); // display message
+			this.message('Processing...'); // display message
 		}
 		cont.style.width = cont.style.height = ''; // refresh output container size
 
@@ -43,13 +43,13 @@ img2css = {
 		img.src = result;
 		cnvs = canvas; // global canvas
 
-		img.onload = function() { // 50ms timeout for canvas size setup
+		img.onload = function() {
 			canvas.width = img.width;
 			canvas.height = img.height;
 			ctx = canvas.getContext('2d');
 			ctx.drawImage(img, 0, 0);
 
-			console.log('img2css: Retrieving image data '+img2css.timer.time());
+			console.log('%cimg2css: Retrieving image data '+img2css.timer.time(),'color: #ff5100;');
 			var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 			var pxs = []; // pixels
 			var rows = []; // rows
@@ -64,7 +64,7 @@ img2css = {
 				rows[j] = pxs.splice(0, canvas.width);
 			}
 
-			console.log('img2css: Sending image data '+img2css.timer.time());
+			console.log('%cimg2css: Sending image data '+img2css.timer.time(),'color: #ff5100;');
 			// init processing
 			if(mode.checked === true) {
 				img2css.renderingMode.boxShadow(rows);
@@ -79,13 +79,13 @@ img2css = {
 	renderingMode: {
 		// box-shadow rendering mode. send image data
 		boxShadow: function(canvas) {
-			console.log('img2css: Running processing in box-shadow mode '+img2css.timer.time());
+			console.log('%cimg2css: Running processing in box-shadow mode '+img2css.timer.time(),'color: #ff5100;');
 			socket.emit('processBoxShadow', canvas);
 		},
 
 		// div rendering mode. send image data
 		div: function(canvas) {
-			console.log('img2css: Running processing in div mode '+img2css.timer.time());
+			console.log('%cimg2css: Running processing in div mode '+img2css.timer.time(),'color: #ff5100;');
 			socket.emit('processDiv', canvas);
 		}
 	},
@@ -93,7 +93,7 @@ img2css = {
 	// Render image data
 	render: {
 		boxShadow: function(rows, nodesNum) {
-			console.log('img2css: Rendering processed data '+img2css.timer.time());
+			console.log('%cimg2css: Rendering processed data '+img2css.timer.time(),'color: #ff5100;');
 			var initPixel = document.createElement('div'),
 					wrapper = document.createElement('div');
 			cont.style.width = cnvs.width + 'px';
@@ -109,7 +109,7 @@ img2css = {
 		},
 
 		div: function(rows, nodesNum) {
-			console.log('img2css: Rendering processed data '+img2css.timer.time());
+			console.log('%cimg2css: Rendering processed data '+img2css.timer.time(),'color: #ff5100;');
 			var wrapper = document.createElement('div');
 			cont.style.width = cnvs.width + 'px';
 			cont.style.height = cnvs.height + 'px';
@@ -159,7 +159,7 @@ img2css = {
 		// display processing time
 		processedMsg = text + nodesNum + '<br>Processing time: ' + this.timer.time();
 		this.message(processedMsg);
-		console.log('img2css: Done! ' + text + nodesNum + ' Processing time: ' + this.timer.time());
+		console.log('%cimg2css: Done! ' + text + nodesNum + ' Processing time: ' + this.timer.time(),'color: #ff5100;');
 	},
 
 	// notifications
@@ -186,7 +186,7 @@ img2css = {
 			if (xhr.status === 200) {
 				fileReader.onload = function(event) {
 					img2css.run(event.target.result, 'test');
-					console.log('--> img2css: Input has been received, run();');
+					console.log('%c--> img2css: Input has been received, run();','color: #ff5100;');
 				};
 				fileReader.readAsDataURL(xhr.response);
 			}
@@ -203,7 +203,7 @@ img2css = {
 			bt = new Date();
 			bt = bt.getTime();
 
-			return (bt - at - 50) / 1000 + 's';
+			return (bt - at) / 1000 + 's';
 		}
 	}
 };
@@ -218,13 +218,13 @@ img2css.message('Be careful with hi-res images. This may take awhile... and free
 
 // box-shadow rendering mode. receive and render processed image data
 socket.on('processedBoxShadow', function(rows, nodesNum) {
-	console.log('img2css: Receiving processed data '+img2css.timer.time());
+	console.log('%cimg2css: Receiving processed data '+img2css.timer.time(),'color: #ff5100;');
 	img2css.render.boxShadow(rows, nodesNum);
 });
 
 // div rendering mode. receive and render processed image data
 socket.on('processedDiv', function(rows, nodesNum) {
-	console.log('img2css: Receiving processed data '+img2css.timer.time());
+	console.log('%cimg2css: Receiving processed data '+img2css.timer.time(),'color: #ff5100;');
 	img2css.render.div(rows, nodesNum);
 });
 
@@ -242,7 +242,7 @@ inputImg.onchange = function(event) {
 		img2css.run(event.target.result);
 	};
 	fileReader.readAsDataURL(file);
-	console.log('--> img2css: Input has been received, run();');
+	console.log('%c--> img2css: Input has been received, run();','color: #ff5100;');
 };
 
 // input event listener
